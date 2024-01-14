@@ -36,19 +36,19 @@ def train_test(args):
     print(datetime.now())
 
     utils.set_deterministic(args.seed)
-    utils.print_config_description(args.conf_path)  # 输出description
+    utils.print_config_description(args.conf_path)  
 
     config_dict = utils.load_env(args.conf_path)
     assert config_dict.get("config_root",
                            None) != None, "No config_root in config/conf.json"
     config_path = os.path.join(
         config_dict["config_root"],
-        config_dict[args.corpus_type])  # 通过拼接得到读取到了six.json的路径
-    utils.print_config_description(config_path)  # 输出description
+        config_dict[args.corpus_type])  
+    utils.print_config_description(config_path)  
 
     # Make model directory
-    model_path = args.model_path  # 用以保存模型的路径
-    os.makedirs(model_path, exist_ok=True)  # 创建改路径的目录
+    model_path = args.model_path  
+    os.makedirs(model_path, exist_ok=True)  
 
     # Initialize dataset
     DataManager = utils.DataManager(config_path)
@@ -58,30 +58,23 @@ def train_test(args):
         assert args.output_num == 6
 
     if args.label_type == "categorical":
-        emo_num = DataManager.get_categorical_emo_num()  # 获得情绪类别个数
+        emo_num = DataManager.get_categorical_emo_num()  
         print(emo_num)
         assert args.output_num == emo_num
 
     audio_path, video_path, label_path = utils.load_audio_and_label_file_paths(
         args)  # 获取路径
     print(audio_path, video_path, label_path)
-    """
-    将audio与video对比
-    得到一一对应的视频文件和语音文件  存在fnames_aud 和fname_vid内
-    audio得到的是一个个文件，video得到的是一个个目录    即一个音频文件对应一个视频目录
-    """
-    fnames_aud, fnames_vid = [], []  # 列表
-    v_fnames = os.listdir(video_path)  # 获取目录下所有的目录和文件，保存在列表v_fnames内
+    
+    fnames_aud, fnames_vid = [], []  
+    v_fnames = os.listdir(video_path)  
     for fname_aud in os.listdir(audio_path):
         if fname_aud.replace('.wav', '') in v_fnames:
             fnames_aud.append(fname_aud)
             fnames_vid.append(fname_aud.replace('.wav', ''))
     fnames_aud.sort()
     fnames_vid.sort()
-    """
-    分别将audio和video与label对比
-    得到有label的每一个文件的具体地址 label_path/filename.wav  存放在train_wav_path和train_vid_path内
-    """
+    
     snum = 10000000000000000
     train_wav_path = DataManager.get_wav_path(split_type="train",
                                             wav_loc=audio_path,
@@ -93,14 +86,12 @@ def train_test(args):
                                             fnames=fnames_vid,
                                             lbl_loc=label_path)[:snum]
 
-    train_utts = [fname.split('/')[-1] for fname in train_wav_path]  # 得到文件名
+    train_utts = [fname.split('/')[-1] for fname in train_wav_path]  
 
-    # 返回数组，每一行是一个情绪打分序列
     train_labs = DataManager.get_msp_labels(train_utts,
                                             lab_type=lab_type,
                                             lbl_loc=label_path)
 
-    # 得到所有文件的列表
     train_wavs = utils.WavExtractor(train_wav_path).extract()
 
     train_vids = utils.VidExtractor(train_vid_path).extract()
@@ -115,7 +106,6 @@ def train_test(args):
         label_config=DataManager.get_label_config(lab_type))
 
 
-    # 将训练集的音频和视频的标准化统计信息保存到文件中，一遍在测试和预测时使用
     train_set.save_norm_stat(model_path + "/train_norm_stat.pkl")
 
     train_dataloader = DataLoader(train_set,num_workers=args.batch_size,
@@ -159,7 +149,6 @@ def train_test(args):
     modelWrapper.load_model("wav2vec2-large-robust-finetunned/model/wav2vec2",
                             'train')
 
-    # 添加：
     focal_loss = Focal_Loss()
 
     # Initialize loss function
@@ -181,7 +170,7 @@ def train_test(args):
         print(datetime.now())
         print("Epoch:", epoch)
         lm.init_stat()
-        modelWrapper.set_train()  # 训练模式
+        modelWrapper.set_train()  
         for xy_pair in tqdm(train_dataloader):
             xa = xy_pair[0]  
             xv = xy_pair[1]
@@ -189,13 +178,10 @@ def train_test(args):
             mask = xy_pair[3]
 
             # randomly shutting off modalities
-            """
-            0.2的几率关闭audio模态，0.2的几率关闭video模态，且两模态不会同时关闭
-            """
+
             p1 = 0.2
             p2 = 0.2
 
-            # 生成0~1之前的随机数
             randn = torch.rand(1)
 
             if randn < p1:
@@ -211,7 +197,6 @@ def train_test(args):
             y = y.cuda(non_blocking=True).float()
             mask = mask.cuda(non_blocking=True).float()
 
-            # 自动类型转换 混合精度训练
             with autocast():
                 preds_va, loss1, loss2 = modelWrapper.feed_forward(
                     xa, xv, attention_mask=mask)
@@ -371,7 +356,6 @@ if __name__ == "__main__":
     parser.add_argument('--loss_w', default=0.7, type=float)
 
     # Label Learning Arguments
-    # 需要调整
     parser.add_argument('--label_learning', default="multi-label", type=str)
 
     parser.add_argument('--corpus', default="USC-IEMOCAP", type=str)
