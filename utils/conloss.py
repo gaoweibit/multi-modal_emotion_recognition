@@ -11,8 +11,8 @@ class Focal_Loss(nn.Module):
 
     def forward(self, preds, labels):
         """
-		preds:softmax输出结果
-		labels:真实值
+		preds:softmax output
+		labels: true
 		"""
         eps = 1e-7
         preds = F.softmax(preds, dim=-1)
