@@ -1,0 +1,10 @@
+{
+    "data_split_type":{
+        "train": "Train",
+        "test": "Test"
+    },
+    "categorical":{
+        "emo_type": ["ang", "sad", "neu", "hap"]
+    },
+    "description": "IEMOCAP corpus - 4 classes"
+}

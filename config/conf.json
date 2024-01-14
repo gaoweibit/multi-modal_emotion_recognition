@@ -1,0 +1,8 @@
+{
+    "description" : "conf.json has been read",
+    "config_root": "config/config_files",
+    "MSP-IMPROV_four_primary": "improv/four.json",
+    "MSP-IMPROV_ALL_secondary": "improv/ten.json",
+    "CREMA-D_ALL_primary": "crema-d/six.json",
+    "IEMOCAP_four": "iemocap/four.json"
+}
