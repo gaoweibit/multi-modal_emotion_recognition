@@ -63,7 +63,7 @@ def train_test(args):
         assert args.output_num == emo_num
 
     audio_path, video_path, label_path = utils.load_audio_and_label_file_paths(
-        args)  # 获取路径
+        args)  
     print(audio_path, video_path, label_path)
     
     fnames_aud, fnames_vid = [], []  
