@@ -59,19 +59,16 @@ class MultiHeadSelfAttention(nn.Module):
     def forward(self, x):
         batch_size, seq_len, embed_dim = x.size()
 
-        # 将输入向量拆分为多个头
         q = self.query(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
         k = self.key(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
         v = self.value(x).view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
 
-        # 计算注意力权重
+        # weight
         attn_weights = torch.matmul(q, k.transpose(-2, -1)) / torch.sqrt(torch.tensor(self.head_dim, dtype=torch.float))
         attn_weights = torch.softmax(attn_weights, dim=-1)
 
-        # 注意力加权求和
         attended_values = torch.matmul(attn_weights, v).transpose(1, 2).contiguous().view(batch_size, seq_len, embed_dim)
 
-        # 经过线性变换和残差连接
         x = self.fc(attended_values) + x
 
         return x
