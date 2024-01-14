@@ -7,8 +7,8 @@ import json
 def set_deterministic(seed):
     os.environ["CUBLAS_WORKSPACE_CONFIG"]=":4096:8"
     # torch.use_deterministic_algorithms(True)
-    torch.manual_seed(seed)   # Pytorch随机种子
-    np.random.seed(seed)      # np随机种子
+    torch.manual_seed(seed)   
+    np.random.seed(seed)      
 
 def print_config_description(conf_path):
     with open(conf_path, 'r') as f:
