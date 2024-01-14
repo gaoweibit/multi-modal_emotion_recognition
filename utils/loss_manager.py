@@ -76,7 +76,7 @@ def unweighted_accuracy(test_truth_i, test_preds_i):
     accuracy = correct / total
     return accuracy
 
-# 计算加权准确率
+
 def weighted_accuracy(test_truth_i, test_preds_i):
 
     class_count = np.bincount(test_truth_i)
@@ -87,7 +87,7 @@ def weighted_accuracy(test_truth_i, test_preds_i):
         idx = np.where(test_truth_i == i)[0]
         class_accuracy[i] = np.mean(test_preds_i[idx] == test_truth_i[idx])
 
-    # 计算加权准确率
+    
     wa = np.sum(class_accuracy * class_count) / len(test_truth_i)
 
     return wa
@@ -148,9 +148,9 @@ def scores(root):
     print('-------------------------')
 
     for i in range(len(columns)):
-        binary_truth = (test_truth_i == i).astype(int)  # 当前情绪类别标记为1，其余情绪类别标记为0
+        binary_truth = (test_truth_i == i).astype(int)  
         binary_preds = (test_preds_i == i).astype(int)
-        binary_acc = accuracy_score(binary_truth, binary_preds)  # 计算二分类准确率
+        binary_acc = accuracy_score(binary_truth, binary_preds)  
         print('Binary accuracy for emotion {} = {:5.3f}'.format(i, binary_acc))
 
     return wa, ua
