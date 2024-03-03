@@ -1,6 +1,6 @@
 model_type=wav2vec2-large-robust
 
-model=AuxFormer
+model=emotion_model
 
 corpus=IEMOCAP
 num_classes=four #four or ALL
